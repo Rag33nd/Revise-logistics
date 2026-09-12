@@ -1,0 +1,1056 @@
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+:root {
+    --bg-color: #F7E6CA;
+    --box-main: #AD9C8E;
+    --box-dark: #8c7d71; 
+    --box-light: #D9BBB0;
+    --box-inside: #6d6158;
+    --text-color: #2b2521; 
+    
+    --texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+
+/* ========================================= */
+/* --- 0. FEJLÉC (HEADER) NAVIGÁCIÓ --- */
+/* ========================================= */
+.site-header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 30px 5%; /* Alapból szellősebb */
+    z-index: 100;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Alapból átlátszó! */
+    background: transparent; 
+}
+
+/* Ez az osztály kapcsol be, amikor legörgetünk */
+.site-header.scrolled {
+    background: rgba(247, 230, 202, 0.85); /* A var(--bg-color) áttetsző változata */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    padding: 15px 5%; /* Összehúzódik picit! */
+}
+
+/* Amikor sötét háttérre (ROI) érünk, ezt a GSAP fogja sötétíteni */
+.site-header.dark-mode {
+    background: rgba(26, 23, 21, 0.85); /* Sötét tejüveg */
+}
+.site-header.dark-mode .header-logo,
+.site-header.dark-mode .header-nav a {
+    color: var(--bg-color); /* Világos szöveg */
+}
+.site-header.dark-mode .header-cta {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.header-logo {
+    font-size: 2rem; font-weight: 700; color: var(--text-color);
+    cursor: pointer; transition: color 0.3s;
+}
+
+.header-nav { 
+    display: flex; 
+    gap: 40px; 
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.header-nav a {
+    text-decoration: none; color: var(--text-color);
+    font-weight: 500; font-size: 1.1rem; opacity: 0.6;
+    transition: opacity 0.2s, color 0.3s;
+}
+.header-nav a:hover { opacity: 1; }
+
+.header-cta {
+    text-decoration: none;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 700; font-size: 1.1rem;
+    transition: transform 0.2s, background-color 0.2s, color 0.3s;
+}
+.header-cta:hover { transform: scale(1.05); }
+
+/* A régi, csúf .logo eltüntetése a biztonság kedvéért */
+.logo { display: none !important; }
+
+.hero-container {
+    position: relative;
+    width: 100%; 
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.logo { position: absolute; top: 40px; font-size: 2.5rem; font-weight: 700; z-index: 50; }
+
+.hero-text-static {
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    margin: auto; 
+    height: fit-content; 
+    width: 100%;
+    text-align: center;
+    z-index: 20; 
+    opacity: 0; 
+}
+.hero-text-static h1 { font-size: 5rem; line-height: 1; margin-bottom: 20px; }
+.hero-text-static p { font-size: 1.5rem; opacity: 0.8; }
+
+.scene {
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    margin: auto; 
+    width: 250px;
+    height: 250px;
+    perspective: 1200px;
+}
+.scene-back { z-index: 10; } 
+.scene-front { z-index: 30; } 
+
+.box-half {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(-15deg) rotateY(-25deg); 
+    will-change: transform;
+}
+
+/* ========================================= */
+/* --- KARTON TEXTÚRA ÉS PUHA ÉLEK --- */
+/* ========================================= */
+.face {
+    position: absolute; width: 250px; height: 250px;
+    
+    /* A border-radius TÖRÖLVE lett, hogy eltűnjenek a lyukak! */
+    
+    /* Lágyabb, kicsit áttetszőbb szegély a kemény vonal helyett (ez puhítja az éleket) */
+    border: 2px solid rgba(140, 125, 113, 0.4);
+    
+    /* Belső árnyék, hogy "puffadtabb" legyen a doboz */
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.06);
+    
+    background-image: var(--texture); 
+    background-blend-mode: multiply;  
+}
+
+.front  { transform: translateZ(125px); background-color: var(--box-main); }
+.back   { transform: rotateY(180deg) translateZ(125px); background-color: var(--box-inside); } 
+.right  { transform: rotateY(90deg) translateZ(125px); background-color: var(--box-light); }
+.left   { transform: rotateY(-90deg) translateZ(125px); background-color: var(--box-light); }
+.bottom { transform: rotateX(-90deg) translateZ(125px); background-color: var(--box-dark); }
+
+.top-plane { 
+    transform-style: preserve-3d;
+    transform: rotateX(90deg) translateZ(125px); 
+    background: transparent; border: none;
+}
+
+/* ========================================= */
+/* --- A DOBOZRA NYOMTATOTT PNG LOGÓ --- */
+/* ========================================= */
+.box-logo-img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Pontosan középre teszi a lapon */
+    
+    /* Állítsd be a méretét! A doboz 250px széles, így a 150px jól mutat. */
+    width: 150px; 
+    height: auto;
+    
+    /* A RÁNYOMTATOTT HATÁS BEÁLLÍTÁSAI */
+    opacity: 0.85; /* Picit átlátszó, hogy átüssön rajta a karton textúra */
+    mix-blend-mode: multiply; /* EZ FONTOS: Ráolvasztja a doboz színére! */
+    pointer-events: none; 
+}
+
+.flap {
+    position: absolute; width: 125px; height: 250px;
+    background-color: var(--box-main);
+    
+    /* A border-radius innen is TÖRÖLVE lett! */
+    
+    border: 2px solid rgba(140, 125, 113, 0.4);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.06);
+    
+    background-image: var(--texture); 
+    background-blend-mode: multiply;
+}
+.flap-left { left: 0; transform-origin: left; }
+.flap-right { right: 0; transform-origin: right; }
+
+/* ========================================= */
+/* --- SZIGSZALAG (DUCT TAPE) TRÜKKÖK --- */
+/* ========================================= */
+
+.flap-left::after {
+    content: '';
+    position: absolute;
+    right: -8px; 
+    top: 20%;
+    width: 45px;
+    height: 110px;
+    background-color: rgba(220, 220, 220, 0.4);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 2px 2px 5px rgba(0,0,0,0.1);
+    transform: rotate(-3deg); 
+}
+
+.flap-right::after {
+    content: '';
+    position: absolute;
+    left: -5px; 
+    bottom: 25%;
+    width: 40px;
+    height: 90px;
+    background-color: rgba(220, 220, 220, 0.4);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.4), -2px 2px 5px rgba(0,0,0,0.1);
+    transform: rotate(4deg);
+}
+
+.left::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: 20%;
+    width: 140px;
+    height: 45px;
+    background-color: rgba(220, 220, 220, 0.35);
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.5), 0 3px 6px rgba(0,0,0,0.1);
+    transform: rotate(-6deg);
+}
+
+.right::after {
+    content: '';
+    position: absolute;
+    bottom: 40%;
+    right: 15%;
+    width: 120px;
+    height: 40px;
+    background-color: rgba(220, 220, 220, 0.35);
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.5), 0 3px 6px rgba(0,0,0,0.1);
+    transform: rotate(4deg);
+}
+
+.next-section, .footer-game { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 2rem; border-top: 1px solid rgba(0,0,0,0.1);}
+
+/* ========================================= */
+/* --- 2. THE PAIN POINT SZEKCIÓ --- */
+/* ========================================= */
+.pain-section {
+    width: 100%; min-height: 80vh;
+    position: relative; /* KULCS: Hogy a grafikon alá tudjon menni! */
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background-color: var(--box-inside); color: var(--bg-color); text-align: center; padding: 100px 20px;
+    overflow: hidden; /* Hogy a grafikon ne lógjon ki */
+}
+.pain-content {
+    position: relative; z-index: 10; /* Ez tartja a szöveget a grafikon FÖLÖTT */
+}
+
+/* A vörös zuhanó grafikon a háttérben */
+.pain-bg-chart {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; z-index: 1;
+    opacity: 0.6;
+    /* Alapból el van rejtve (jobbról balra vágjuk el), a GSAP fogja behozni! */
+    clip-path: inset(0 100% 0 0); 
+}
+.pain-bg-chart svg { width: 100%; height: 100%; }
+.chart-line {
+    fill: none; stroke: #ff4d4d; stroke-width: 8;
+    stroke-linecap: round; stroke-linejoin: round;
+    filter: drop-shadow(0 0 15px rgba(255, 77, 77, 0.8)); /* Vörös Glow */
+}
+.chart-fill {
+    fill: rgba(255, 77, 77, 0.15); /* Halvány vörös kitöltés a vonal alatt */
+}
+
+.pain-title { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-bottom: 20px; }
+.pain-stat { font-size: 12rem; font-weight: 700; line-height: 1; color: var(--box-light); margin-bottom: 20px; }
+.pain-stat span { font-size: 5rem; opacity: 0.8; }
+.pain-subtitle { font-size: 1.8rem; max-width: 600px; opacity: 0.8; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+/* --- PÖTTYÖK KATTINTHATÓSÁGA --- */
+.dot {
+    width: 16px; height: 16px; border-radius: 50%; background-color: var(--box-light);
+    border: 3px solid var(--bg-color); z-index: 2; transition: all 0.3s;
+    cursor: pointer; /* ⬅️ Ettől lesz "kattintható kéz" ikon rajta! */
+}
+/* ... (A többi CSS marad a régi) ... */
+
+/* ========================================= */
+/* --- 3. A FOLYAMAT SZEKCIÓ (TIMELINE) --- */
+/* ========================================= */
+.process-section {
+    width: 100%;
+    background-color: var(--bg-color);
+    padding: 150px 5%;
+}
+
+.process-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 50px;
+}
+
+/* BAL OLDAL: Idősáv */
+.process-text-side {
+    width: 50%;
+    position: relative;
+    padding-left: 50px; /* Hely a vonalnak */
+}
+
+.timeline-line {
+    position: absolute;
+    left: 14px; /* A pontok közepéhez igazítva */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: rgba(173, 156, 142, 0.3); /* Halvány alapszín */
+}
+
+.timeline-fill {
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    height: 0%; /* Ezt a GSAP fogja tölteni! */
+    background-color: var(--box-inside);
+}
+
+.process-step {
+    position: relative;
+    padding: 50px 0 150px 0; /* Hely a lépések között */
+}
+
+/* A kis pontok */
+.step-dot {
+    position: absolute;
+    left: -42px; /* Pontosan ráül a vonalra */
+    top: 55px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: var(--box-light);
+    border: 2px solid var(--bg-color);
+    transition: all 0.4s ease;
+    z-index: 2;
+}
+
+/* Amikor a lépés aktív (Ezt a JS adja hozzá) */
+.process-step.active .step-dot {
+    background-color: var(--box-inside);
+    transform: scale(1.5);
+    box-shadow: 0 0 15px rgba(109, 97, 88, 0.6); /* GLOW effekt */
+}
+
+.process-step h3 { font-size: 3rem; margin-bottom: 20px; }
+.process-step p { font-size: 1.4rem; opacity: 0.7; max-width: 400px; }
+
+/* JOBB OLDAL: A leragadó képek */
+.process-visual-side {
+    width: 50%;
+}
+
+.sticky-visuals {
+    position: sticky;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.process-img {
+    position: absolute;
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 20px; /* Csak a teszt képek miatt, háttér nélkülinél vedd ki */
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.process-img.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* --- 2. PAIN POINT --- */
+.pain-section {
+    width: 100%; min-height: 80vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background-color: var(--box-inside); color: var(--bg-color); text-align: center; padding: 100px 20px;
+}
+.pain-title { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-bottom: 20px; }
+.pain-stat { font-size: 12rem; font-weight: 700; line-height: 1; color: var(--box-light); margin-bottom: 20px; }
+.pain-stat span { font-size: 5rem; opacity: 0.8; }
+.pain-subtitle { font-size: 1.8rem; max-width: 600px; opacity: 0.8; }
+
+/* --- 3. PINNED PROCESS SZEKCIÓ --- */
+.process-wrapper {
+    width: 100%;
+    background-color: var(--bg-color); /* A szín átkerült ide! */
+    padding: 15vh 0; /* ⬅️ 15% extra tér felül és alul a képernyőn! */
+}
+
+.process-pinned-section {
+    width: 100%;
+    height: 100vh; 
+    background-color: transparent; /* Ez most már átlátszó, a wrapper adja a színt */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.process-container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    height: 60vh; /* Ekkora dobozban játszódik le minden */
+    align-items: center;
+}
+
+/* BAL: A csík és a pöttyök */
+.process-nav {
+    width: 10%; height: 100%; position: relative;
+    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+}
+.timeline-line {
+    position: absolute; top: 15px; bottom: 15px; left: 50%; transform: translateX(-50%);
+    width: 2px; background-color: rgba(173, 156, 142, 0.3); z-index: 1;
+}
+.timeline-fill {
+    position: absolute; top: 0; left: 0; width: 100%; height: 0%; 
+    background-color: var(--box-inside);
+}
+.dot {
+    width: 16px; height: 16px; border-radius: 50%; background-color: var(--box-light);
+    border: 3px solid var(--bg-color); z-index: 2; transition: all 0.3s;
+}
+.dot.active {
+    background-color: var(--box-inside); transform: scale(1.5);
+    box-shadow: 0 0 15px rgba(109, 97, 88, 0.8); /* Ez a GLOW effekt! */
+}
+
+/* KÖZÉP: A szövegek */
+.process-texts {
+    width: 45%; height: 100%; position: relative;
+    display: flex; align-items: center; padding: 0 40px;
+}
+.step-text {
+    position: absolute; left: 40px; right: 40px;
+    opacity: 0; /* Alapból minden rejtve van */
+    transform: translateY(30px); /* Kicsit lejjebb vannak */
+}
+.step-text.active { opacity: 1; transform: translateY(0); }
+.step-text h3 { 
+    font-size: 3rem; 
+    margin-bottom: 20px; 
+    white-space: nowrap; /* EZ AZ ÚJ SOR: Erőszakkal egy sorban tartja a szöveget! */
+}
+.step-text p { font-size: 1.5rem; opacity: 0.8; }
+
+/* JOBB: A képek */
+.process-visuals {
+    width: 45%; height: 100%; position: relative;
+    display: flex; justify-content: center; align-items: center;
+}
+.step-img-container {
+    position: absolute; width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; transform: scale(0.9);
+}
+.step-img-container.active { opacity: 1; transform: scale(1); }
+.step-img-container img {
+    max-width: 90%; max-height: 90%;
+    border-radius: 20px; /* Háttér nélküli képeknél vedd ki a szegélyt! */
+}
+
+/* ========================================= */
+/* --- DIORÁMA SZÍNPAD BEÁLLÍTÁSAI --- */
+/* ========================================= */
+.diorama-stage {
+    position: relative; width: 100%; height: 400px;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.diorama-item {
+    position: absolute; opacity: 0; pointer-events: none;
+}
+#shoe-wrapper.active, #sad-face.active { opacity: 1; }
+
+/* Belső képek méretezése a wrappereken belül */
+#shoe-img { width: 100%; max-width: 350px; height: auto; }
+#clipboard-img { width: 200px; height: auto; }
+#spray-img { width: 300px; height: auto; } /* Négyszeresére növelve! */
+#brush-img { width: 200px; height: auto; } /* Négyszeresére növelve! */
+
+
+/* --- Z-INDEX SZENDVICS LÉTREHOZÁSA --- */
+#box-back { z-index: 10; max-width: 400px; }       
+#spray-wrapper { z-index: 15; } /* A cipő mögött */
+#clipboard-wrapper { z-index: 15; } /* A cipő mögött és picit balra */
+#sad-face { z-index: 15; margin-left: -180px; margin-top: -120px; width: 150px; } 
+
+#shoe-wrapper { z-index: 20; }  /* A FŐSZEREPLŐ */
+
+#box-front { z-index: 25; max-width: 400px; }      
+#brush-wrapper { z-index: 25; } /* A cipő előtt (ezzel súrolunk) */
+
+/* --- FURGON ÉS KEREKEK POZÍCIONÁLÁSA --- */
+#van-container {
+    z-index: 30; 
+    width: 480px; /* JÓVAL NAGYOBB LETT AZ AUTÓ */
+    height: auto;
+}
+#van-body { width: 100%; height: auto; position: relative; z-index: 2; }
+
+/* ⬇️ ITT ÁLLÍTSD BE A KEREKEKET A SAJÁT KÉPEDHEZ! ⬇️ */
+.van-wheel {
+    position: absolute;
+    width: 85px; /* Állítsd be a kerék fizikai méretét! */
+    height: 85px;
+    z-index: 3;
+    bottom: 125px; /* ⬅️ Ha túl lent/fent van, ezt az értéket módosítsd! */
+}
+#wheel-front { left: 71px; }  /* ⬅️ Tologasd jobbra-balra az elsőt! */
+#wheel-back { right: 61px; }  /* ⬅️ Tologasd jobbra-balra a hátsót! */
+
+/* Tisztítók egymás mellett */
+#cleaners { display: flex; gap: 20px; }
+.clean-tool { width: 80px; }
+
+/* ========================================= */
+/* --- 4. ROI KALKULÁTOR (SaaS Style) --- */
+/* ========================================= */
+.roi-section {
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--text-color); /* Sötétbarna/Fekete alapháttér a komolyságért */
+    padding: 100px 5%;
+    color: var(--bg-color); /* Világos szöveg */
+}
+
+
+.roi-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    gap: 80px;
+    align-items: center;
+}
+
+/* BAL OLDAL */
+.roi-input-side {
+    flex: 1;
+}
+
+.roi-title {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.roi-description {
+    font-size: 1.2rem;
+    opacity: 0.7;
+    margin-bottom: 50px;
+    max-width: 450px;
+}
+
+.slider-wrapper {
+    width: 100%;
+    max-width: 500px;
+}
+
+.slider-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.slider-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--box-light);
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1); /* Letisztult elválasztó vonal */
+    padding-bottom: 10px;
+}
+
+.slider-value, .roi-result {
+    white-space: nowrap; /* ⬅️ EZ JAVÍTJA A TÖRDELÉST! */
+}
+
+/* Vékony, elegáns csúszka */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+}
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 4px; /* Nagyon vékony, tech-szerű vonal */
+    cursor: pointer;
+    background: rgba(255,255,255,0.1); 
+    border-radius: 2px;
+}
+input[type=range]::-webkit-slider-thumb {
+    height: 20px; width: 20px; border-radius: 50%;
+    background: var(--box-light); cursor: pointer;
+    -webkit-appearance: none; margin-top: -8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+    transition: transform 0.2s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+/* JOBB OLDAL - Dashboard Card */
+.roi-output-side {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.roi-dashboard-card {
+    background-color: rgba(255, 255, 255, 0.02); /* Nagyon minimális kiemelés */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    margin-bottom: 30px;
+}
+
+.status-dot {
+    width: 10px; height: 10px;
+    background-color: #4ade80; /* Profi "System Online" zöld */
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
+.roi-result {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 15px;
+}
+
+.roi-badge {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1a1715;
+    background-color: #4ade80; /* Nem ordít, csak elegáns plecsni */
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+}
+
+.card-footer {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 20px;
+}
+
+.card-footer p {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    line-height: 1.5;
+}
+/* ========================================= */
+/* --- 5. B2B KAPCSOLATFELVÉTEL ÉS FOOTER --- */
+/* ========================================= */
+.footer-section {
+    width: 100%;
+    background-color: var(--bg-color); /* Világos háttér a formnak */
+    color: var(--text-color);
+    padding: 100px 5% 0 5%;
+    display: flex; flex-direction: column; align-items: center;
+}
+
+.contact-container {
+    width: 100%; max-width: 800px;
+    text-align: center; margin-bottom: 100px;
+}
+.contact-title { font-size: 4rem; margin-bottom: 20px; line-height: 1; }
+.contact-subtitle { font-size: 1.5rem; opacity: 0.7; margin-bottom: 50px; }
+
+/* Űrlap */
+.b2b-form { display: flex; flex-direction: column; gap: 20px; max-width: 500px; margin: 0 auto; }
+.b2b-form input {
+    width: 100%; padding: 18px; font-size: 1.1rem;
+    background: transparent; border: 1px solid rgba(0,0,0,0.2);
+    color: var(--text-color); border-radius: 8px; font-family: inherit;
+    transition: border-color 0.3s;
+}
+.b2b-form input:focus { outline: none; border-color: var(--box-inside); }
+.submit-btn {
+    background-color: var(--text-color); color: var(--bg-color);
+    padding: 18px; font-size: 1.2rem; font-weight: 700;
+    border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s;
+}
+.submit-btn:hover { transform: translateY(-3px); }
+
+/* Klasszikus B2B Footer infók */
+.site-footer {
+    width: 100%; max-width: 1200px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 40px 0; display: flex; justify-content: space-between;
+    font-size: 0.9rem; opacity: 0.6;
+}
+.footer-links a { color: var(--text-color); text-decoration: none; margin-left: 20px; }
+
+/* --- AZ EASTER EGG (Az oldal legalján) --- */
+.easter-egg-strip {
+    width: 100%; height: 40px;
+    background-color: var(--box-inside); /* Sötét csík */
+    position: relative; overflow: hidden; display: flex; align-items: center;
+}
+
+/* A 2D sziluett Furgon (Balra néz) */
+.silhouette-van {
+    width: 80px; height: 25px;
+    background-color: var(--bg-color);
+    border-radius: 20px 4px 4px 4px; /* Bal eleje íves (szélvédő) */
+    position: absolute; left: 50px; bottom: 1px;
+    opacity: 0.4;
+    z-index: 10;
+}
+/* Ablak kivágás (Szélvédő és oldalablak) */
+.silhouette-van::after {
+    content: ''; position: absolute;
+    top: 4px; left: 5px;
+    width: 20px; height: 15px;
+    background-color: var(--box-inside); /* Beleolvad a háttérbe, "lyuk" hatás */
+    border-radius: 10px 2px 2px 2px;
+}
+
+/* Lebegő, repülő KARTONDOBOZOK a háttérben */
+.floating-box {
+    position: absolute; 
+    background-color: var(--box-light); 
+    border-radius: 2px;
+    z-index: 5; /* A furgon mögé/bele mennek */
+    left: 100%; /* Alapból kint vannak jobbon */
+    opacity: 0;
+}
+
+/* Különböző formák és méretek */
+.box-1 { width: 15px; height: 15px; top: 15px; animation: flyInBox 4s linear infinite; } /* Kiskocka */
+.box-2 { width: 35px; height: 10px; top: 25px; animation: flyInBox 5s linear infinite 1.5s; } /* Hosszúkás, lapos */
+.box-3 { width: 20px; height: 25px; top: 10px; animation: flyInBox 6s linear infinite 0.8s; } /* Magas doboz */
+.box-4 { width: 25px; height: 15px; top: 30px; animation: flyInBox 4.5s linear infinite 2.5s; } /* Normál téglalap */
+
+/* Animáció: Jobbról be a furgon hátuljába */
+@keyframes flyInBox {
+    0% { left: 100%; transform: rotate(0deg); opacity: 0; }
+    5% { left: 100%; transform: rotate(0deg); opacity: 0.3; } /* Halványan bejönnek */
+    
+    /* 140px a furgon hátulja. Itt még látszanak. */
+    85% { left: 140px; transform: rotate(-200deg); opacity: 0.3; } 
+    
+    /* 100px már a furgon közepe. Itt azonnal eltűnnek, mintha elnyelte volna őket! */
+    90% { left: 100px; transform: rotate(-220deg); opacity: 0; } 
+    
+    100% { left: 100px; opacity: 0; }
+}
+
+/* ========================================= */
+/* --- LEGAL PAGE (ToS & Privacy Policy) --- */
+/* ========================================= */
+.legal-page {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-y: auto; /* Itt legyen normál görgetés */
+}
+
+.legal-header {
+    padding: 30px 5%;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    /* ÚJ SOROK, hogy a gomb jobbra menjen: */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.back-btn {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: opacity 0.3s;
+}
+.back-btn:hover { opacity: 0.6; }
+
+.legal-container {
+    max-width: 800px;
+    margin: 60px auto 100px auto;
+    padding: 0 20px;
+}
+
+.legal-section h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+.last-updated {
+    font-size: 1rem;
+    opacity: 0.5;
+    margin-bottom: 50px;
+}
+.legal-section h2 {
+    font-size: 1.5rem;
+    margin-top: 40px;
+    margin-bottom: 15px;
+    color: var(--box-inside);
+}
+.legal-section p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    opacity: 0.85;
+}
+.legal-divider {
+    border: none;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    margin: 80px 0;
+}
+
+/* ========================================= */
+/* --- NYELVVÁLASZTÓ (LANG SWITCHER) --- */
+/* ========================================= */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.lang-switcher {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 30px;
+    padding: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    cursor: pointer;
+    opacity: 0.5;
+    transition: all 0.3s;
+}
+
+.lang-btn.active {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    opacity: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Sötét mód kezelése (ROI szekció felett) */
+.site-header.dark-mode .lang-switcher { background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+.site-header.dark-mode .lang-btn { color: var(--bg-color); }
+.site-header.dark-mode .lang-btn.active { background-color: var(--bg-color); color: var(--text-color); }
+
+/* ============================================================== */
+/* --- MOBIL RESZPONZIVITÁS (Minden, ami 768px-nél kisebb) --- */
+/* ============================================================== */
+@media (max-width: 768px) {
+    /* ... itt jönnek a mobil beállítások ... */
+    .header-actions { gap: 10px; }
+    .lang-btn { padding: 5px 8px; font-size: 0.8rem; }
+    /* ... és a többi mobil kódod ... */
+}
+
+/* ============================================================== */
+/* --- MOBIL RESZPONZIVITÁS (Minden, ami 768px-nél kisebb) --- */
+/* ============================================================== */
+
+@media (max-width: 768px) {
+    
+    /* --- 0. FEJLÉC --- */
+    .header-nav { display: none; }
+    .site-header { padding: 15px 5%; }
+    .header-logo { font-size: 1.4rem; }
+    .header-cta { padding: 10px 20px; font-size: 0.9rem; }
+    
+
+    
+
+    /* --- 1. HERO SZEKCIÓ --- */
+    .hero-text-static {
+        top: 0; 
+        bottom: 0; 
+        margin: auto; /* TÖKÉLETESEN KÖZÉPRE ZÁRJA MOBILON IS! */
+    }
+    .hero-text-static h1 { font-size: 2.5rem; margin-bottom: 15px; line-height: 1.1; }
+    .hero-text-static p { font-size: 1rem; padding: 0 20px; }
+    .scene { top: 0; bottom: 0; }
+    .box-logo-img { width: 100px; }
+
+
+    /* --- 2. FÁJDALOMPONT --- */
+    .pain-section { padding: 60px 20px; }
+    .pain-title { font-size: 1.5rem; }
+    .pain-stat { font-size: 6rem; margin-bottom: 10px; }
+    .pain-stat span { font-size: 3rem; }
+    .pain-subtitle { font-size: 1rem; }
+
+    /* --- 3. FOLYAMAT SZEKCIÓ (Tökéletesített Szöveg Elrendezés) --- */
+    .process-container {
+        display: grid !important;
+        grid-template-columns: 30px 1fr; /* 30px a pöttyöknek, a GIGANTIKUS TÖBBI a szövegnek! */
+        grid-template-rows: 45vh 35vh; 
+        gap: 0px 20px; /* 20px gyönyörű távolság a pöttyök és a betűk között */
+        height: 100vh;
+        width: 100%;
+        padding: 0 20px; /* Ne érjen hozzá a telefon széléhez */
+        align-content: center;
+    }
+    
+    .process-visuals {
+        grid-column: 1 / 3;
+        grid-row: 1;
+        width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .diorama-stage {
+        transform: scale(0.65); 
+        transform-origin: center center;
+    }
+
+    .process-nav {
+        grid-column: 1;
+        grid-row: 2;
+        position: relative;
+        height: 250px; 
+        width: 100%;
+        align-self: center; 
+    }
+
+    .process-texts {
+        grid-column: 2;
+        grid-row: 2;
+        position: relative;
+        height: 250px; 
+        width: 100%; /* ⬅️ EZ VOLT A HIBA! Kényszerítjük, hogy kitöltse a teret! */
+        padding: 0;
+        align-self: center; 
+    }
+    
+    .step-text {
+        position: absolute;
+        left: 0; 
+        top: 20px; 
+        width: 100%; /* ⬅️ A szöveg is megkapja a maximális 100% teret! */
+        padding-right: 10px; /* Pici levegő a jobb oldalon */
+    }
+    .step-text h3 { 
+        font-size: 2rem; /* Nagy, bátor, olvasható cím */
+        margin-bottom: 12px; 
+        letter-spacing: -0.5px;
+    }
+    .step-text p { 
+        font-size: 1.15rem; 
+        line-height: 1.5; /* Gyönyörű szellős sorköz a leírásnak */
+        opacity: 0.8;
+    }
+
+    /* --- 4. ROI KALKULÁTOR --- */
+    .roi-container { flex-direction: column; gap: 40px; }
+    .roi-input-side, .roi-output-side { width: 100%; justify-content: center; }
+    .roi-title { font-size: 2rem; }
+    .roi-description { margin-bottom: 30px; font-size: 1rem; }
+    .slider-value { font-size: 1.8rem; }
+    .roi-dashboard-card { padding: 25px; }
+    .roi-result { font-size: 2rem; }
+
+    /* --- 5. B2B KAPCSOLAT ÉS FOOTER --- */
+    .contact-title { font-size: 2.2rem; margin-bottom: 15px; }
+    .contact-subtitle { font-size: 1.1rem; margin-bottom: 30px; }
+    .footer-section { padding: 60px 5% 0 5%; }
+
+    /* ⬅️ EZT ADD HOZZÁ: A Footer mobilos rendberakása */
+    .site-footer {
+        flex-direction: column; /* Egymás alá teszi a sorokat */
+        gap: 15px; /* Kellemes távolság a szövegek között */
+        text-align: center;
+    }
+    .footer-links {
+        display: flex; 
+        gap: 20px; /* Távolság a két link között */
+        justify-content: center;
+    }
+    .footer-links a {
+        margin-left: 0; /* Töröljük a gépes bal margót */
+    }
+    
+    /* ============================================================== */
+    /* --- MOBIL RESZPONZIVITÁS (Minden, ami 768px-nél kisebb) --- */
+    /* ============================================================== */
+
+    @media (max-width: 768px) {
+        /* --- 0. FEJLÉC --- */
+        .header-nav { display: none; }
+        /* ... a többi eddigi mobilos kódod ... */
+    }
+}

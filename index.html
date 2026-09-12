@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revise | Reverse Logistics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ========================================= -->
+    <!-- 0. FEJLÉC (NAVBAR) -->
+    <!-- ========================================= -->
+    <header class="site-header" id="header">
+        <div class="header-logo" onclick="lenis.scrollTo(0)">Revise.</div>
+        <nav class="header-nav">
+            <a href="#problem" data-i18n="nav-problem">The Problem</a>
+            <a href="#process" data-i18n="nav-process">How it Works</a>
+            <a href="#roi" data-i18n="nav-roi">ROI Calculator</a>
+        </nav>
+        
+        <!-- ÚJ: Nyelvválasztó és CTA egy konténerben -->
+        <div class="header-actions">
+            <div class="lang-switcher">
+                <button id="lang-en" class="lang-btn active">EN</button>
+                <button id="lang-hu" class="lang-btn">HU</button>
+            </div>
+            <a href="#contact" class="header-cta" data-i18n="nav-cta">Get Started</a>
+        </div>
+    </header>
+
+    <section class="hero-container">
+        
+        <!-- 1. HÁTSÓ DOBOZFÉL -->
+        <div class="scene scene-back">
+            <div class="box-half">
+                <div class="face back"></div>
+                <div class="face bottom"></div>
+                <div class="face left"></div>
+                <div class="face right"></div>
+            </div>
+        </div>
+
+        <!-- 2. A SZÖVEG -->
+        <div class="hero-text-static">
+            <h1 data-i18n="hero-title">We turn your<br>returns into revenue.</h1>
+            <p data-i18n="hero-sub">Premium reverse logistics and open-box management.</p>
+        </div>
+        
+        <!-- 3. ELSŐ DOBOZFÉL -->
+        <div class="scene scene-front">
+            <div class="box-half">
+                
+                <div class="face front">
+                    <!-- A SAJÁT PNG LOGÓTOK A DOBOZON -->
+                    <img src="images/logo.png" class="box-logo-img" alt="Revise Logo">
+                </div>
+
+                <div class="face top-plane">
+                    <div class="flap flap-left"></div>
+                    <div class="flap flap-right"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- 2. SZEKCIÓ: A FÁJDALOMPONT -->
+    <section class="pain-section" id="problem">
+        <div class="pain-bg-chart">
+            <svg viewBox="0 0 1000 300" preserveAspectRatio="none">
+                <path class="chart-line" d="M0,50 L200,80 L400,60 L600,150 L800,120 L1000,280" />
+                <path class="chart-fill" d="M0,50 L200,80 L400,60 L600,150 L800,120 L1000,280 L1000,300 L0,300 Z" />
+            </svg>
+        </div>
+
+        <div class="pain-content">
+            <h2 data-i18n="pain-title">The e-commerce black hole.</h2>
+            <div class="pain-stat"><span id="pain-counter">0</span><span>%</span></div>
+            <p data-i18n="pain-subtitle">of online purchases are returned.<br>Stop losing money on reverse logistics.</p>
+        </div>
+    </section>
+
+    <!-- 3. SZEKCIÓ: A "LERAGADÓS" FOLYAMAT ANIMÁCIÓ -->
+    <div class="process-wrapper" id="process">
+        <section class="process-pinned-section">
+            <div class="process-container">
+                
+                <!-- BAL OLDAL: A Csík és a 6 Pötty -->
+                <div class="process-nav">
+                    <div class="timeline-line">
+                        <div class="timeline-fill"></div>
+                    </div>
+                    <div class="dot active" id="dot-1"></div>
+                    <div class="dot" id="dot-2"></div>
+                    <div class="dot" id="dot-3"></div>
+                    <div class="dot" id="dot-4"></div>
+                    <div class="dot" id="dot-5"></div>
+                    <div class="dot" id="dot-6"></div>
+                </div>
+
+                <!-- KÖZÉPSŐ OLDAL: A Szövegek (Egymáson vannak!) -->
+                <div class="process-texts">
+                    <div class="step-text active" id="text-1">
+                        <h3 data-i18n="step-1-title">1. The Return</h3>
+                        <p data-i18n="step-1-desc">The customer initiates a return. Instead of going back to your warehouse, it comes to us.</p>
+                    </div>
+                    <div class="step-text" id="text-2">
+                        <h3 data-i18n="step-2-title">2. Direct Routing</h3>
+                        <p data-i18n="step-2-desc">You simply update your return address. The customer's package is automatically routed via your existing courier directly to the Revise warehouse.</p>
+                    </div>
+                    <div class="step-text" id="text-3">
+                        <h3 data-i18n="step-3-title">3. Inspection</h3>
+                        <p data-i18n="step-3-desc">Experts meticulously inspect the product for any damages or missing components.</p>
+                    </div>
+                    <div class="step-text" id="text-4">
+                        <h3 data-i18n="step-4-title">4. Clean & Renew</h3>
+                        <p data-i18n="step-4-desc">We perform professional deep cleaning, aesthetic detailing, and restore the item to its premium visual state.</p>
+                    </div>
+                    <div class="step-text" id="text-5">
+                        <h3 data-i18n="step-5-title">5. Repackaging</h3>
+                        <p data-i18n="step-5-desc">The item gets fresh, secure, open-box certified packaging.</p>
+                    </div>
+                    <div class="step-text" id="text-6">
+                        <h3 data-i18n="step-6-title">6. Resell & Profit</h3>
+                        <p data-i18n="step-6-desc">We list and sell the renewed product on secondary markets. You get the revenue.</p>
+                    </div>
+                </div>
+
+            
+                <!-- JOBB OLDAL: A Képek (Dioráma) -->
+                <div class="process-visuals">
+                    <div class="diorama-stage">
+                        
+                        <!-- 1. LÉPÉS: Szomorú arc -->
+                        <img src="images/szomoru-arc.png" id="sad-face" class="diorama-item active" alt="Sad">
+                        
+                        <!-- A FŐSZEREPLŐ: A Cipő (Wrapperbe téve a bug ellen!) -->
+                        <div id="shoe-wrapper" class="diorama-item active">
+                            <img src="images/cipo.png" id="shoe-img" alt="Sneaker">
+                        </div>
+                        
+                        <!-- 2. LÉPÉS: A Furgon (Nagyobb test) -->
+                        <div id="van-container" class="diorama-item">
+                            <img src="images/furgon-test.png" id="van-body" alt="Van">
+                            <img src="images/kerek.png" class="van-wheel" id="wheel-front" alt="Wheel">
+                            <img src="images/kerek.png" class="van-wheel" id="wheel-back" alt="Wheel">
+                        </div>
+
+                        <!-- 3. LÉPÉS: Bevizsgálás (Clipboard) -->
+                        <div id="clipboard-wrapper" class="diorama-item">
+                            <img src="images/clipboard.png" id="clipboard-img" alt="Inspect">
+                        </div>
+
+                        <!-- 4. LÉPÉS: Tisztítás (Különválasztva Z-index miatt!) -->
+                        <div id="spray-wrapper" class="diorama-item">
+                            <img src="images/spray.png" id="spray-img" alt="Spray">
+                        </div>
+                        <div id="brush-wrapper" class="diorama-item">
+                            <img src="images/kefe.png" id="brush-img" alt="Brush">
+                        </div>
+
+                        <!-- 5. LÉPÉS: A Két Részre Vágott Doboz -->
+                        <img src="images/doboz-hatul.png" id="box-back" class="diorama-item" alt="Box Back">
+                        <img src="images/doboz-elol.png" id="box-front" class="diorama-item" alt="Box Front">
+
+                        <!-- 6. LÉPÉS: A Profit -->
+                        <img src="images/erme.png" id="coin" class="diorama-item" alt="Coin">
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+    </div>
+
+    <!-- 4. SZEKCIÓ: ROI KALKULÁTOR (Minimalista SaaS Design) -->
+    <section class="roi-section" id="roi">
+        <div class="roi-container">
+            
+            <!-- BAL OLDAL: Szöveg és Csúszka -->
+            <div class="roi-input-side">
+                <h2 class="roi-title" data-i18n="roi-title">Calculate your hidden revenue.</h2>
+                <p class="roi-description" data-i18n="roi-desc">Use the slider below to estimate how much trapped capital you can free up every month.</p>
+                
+                <div class="slider-wrapper">
+                    <label for="return-slider" class="slider-label" data-i18n="roi-label">Monthly Returns Value</label>
+                    <div class="slider-value"><span id="slider-val">5,000,000</span> Ft</div>
+                    <input type="range" id="return-slider" min="500000" max="50000000" step="500000" value="5000000">
+                </div>
+            </div>
+
+            <!-- JOBB OLDAL: Eredmény (Dashboard Card) -->
+            <div class="roi-output-side">
+                <div class="roi-dashboard-card">
+                    <div class="card-header">
+                        <span class="status-dot"></span>
+                        <span data-i18n="roi-est">Estimated Recovery</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="roi-result"><span id="recovered-val">3,500,000</span> Ft</div>
+                        <div class="roi-badge" data-i18n="roi-badge">Zero Upfront Cost</div>
+                    </div>
+                    <div class="card-footer">
+                        <p data-i18n="roi-footer">No monthly fees. No storage fees. We only take a commission after a successful resell.</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- ========================================= -->
+    <!-- 5. SZEKCIÓ: B2B KAPCSOLATFELVÉTEL ÉS FOOTER -->
+    <!-- ========================================= -->
+    <section class="footer-section" id="contact">
+        
+        <div class="contact-container">
+            <h2 class="contact-title" data-i18n="contact-title">Ready to recover your revenue?</h2>
+            <p class="contact-subtitle" data-i18n="contact-desc">Leave your details and we'll calculate a custom logistics plan for your store.</p>
+            
+            <form class="b2b-form">
+                <input type="text" placeholder="Your Name" required data-i18n="form-name">
+                <input type="email" placeholder="Company Email" required data-i18n="form-email">
+                <input type="text" placeholder="Website URL (Optional)" data-i18n="form-url">
+                <button type="submit" class="submit-btn" data-i18n="contact-btn">Get Your Free ROI Audit</button>
+            </form>
+        </div>
+
+        <footer class="site-footer">
+            <div class="copyright" data-i18n="footer-copy">&copy; 2026 Revise. All rights reserved.</div>
+            <div class="footer-links">
+                <a href="legal-en.html" data-i18n="footer-privacy">Privacy Policy</a>
+                <a href="legal-en.html" data-i18n="footer-tos">Terms of Service</a>
+            </div>
+        </footer>
+    </section>
+
+    <!-- EASTER EGG (Csak egy díszcsík legalul) -->
+    <div class="easter-egg-strip">
+        <!-- A Furgon Sziluett (beépített kerekekkel) -->
+        <div class="silhouette-van">
+            <div class="van-wheel-1"></div>
+            <div class="van-wheel-2"></div>
+        </div>
+        
+        <!-- A Repülő Dobozok -->
+        <div class="floating-box box-1"></div>
+        <div class="floating-box box-2"></div>
+        <div class="floating-box box-3"></div>
+        <div class="floating-box box-4"></div>
+    </div>
+
+    <!-- ÚJ: A Lenis Smooth Scroll betöltése -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    
+    <!-- GSAP kódok -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
