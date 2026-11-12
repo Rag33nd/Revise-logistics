@@ -35,7 +35,10 @@ const translations = {
         "roi-label": "Monthly Returns Value",
         "roi-est": "Estimated Recovery",
         "roi-badge": "Zero Upfront Cost",
-        "roi-footer": "No monthly fees. No storage fees. We only take a commission after a successful resell.",
+        "roi-footer": "No monthly fees. No storage fees. We only take a commission after a successful resell. (Estimates are based on industry averages and do not guarantee exact returns.)",
+        
+        // Kapcsolat és Footer részhez add hozzá:
+        "form-consent": "I have read and accept the <a href='legal-en.html'>Privacy Policy</a> and <a href='legal-en.html'>Terms of Service</a>.",
         
         // Kapcsolat és Footer
         "contact-title": "Ready to recover your revenue?",
@@ -78,7 +81,10 @@ const translations = {
         "roi-label": "Havi Visszáru Értéke",
         "roi-est": "Várható Megtérülés",
         "roi-badge": "Zéró Előzetes Költség",
-        "roi-footer": "Nincs havidíj. Nincs tárolási díj. Csak a sikeres eladások után vonunk le jutalékot.",
+        "roi-footer": "Nincs havidíj. Nincs tárolási díj. Csak a sikeres eladások után vonunk le jutalékot. (A kalkulátor iparági becslésen alapul, nem minősül garantált ajánlattételnek.)",
+        
+        // Kapcsolat és Footer részhez add hozzá:
+        "form-consent": "Elolvastam és elfogadom az <a href='legal-hu.html'>Adatvédelmi Tájékoztatót</a> és az <a href='legal-hu.html'>ÁSZF-et</a>.",
         
         "contact-title": "Visszaszerezzük a pénzed?",
         "contact-desc": "Add meg az adataidat, és elkészítjük a webshopodra szabott logisztikai tervet.",
@@ -113,6 +119,11 @@ function setLanguage(lang) {
                 element.innerHTML = translations[lang][key];
             }
         }
+    });
+
+    // Lábléc jogi linkjeinek átállítása az aktuális nyelvre:
+    document.querySelectorAll('.footer-links a').forEach(link => {
+        link.setAttribute('href', `legal-${lang}.html`);
     });
 
     // ⬇️ ÚJ RÉSZ: Miután kicserélte a szöveget, frissíti az animációkat!
